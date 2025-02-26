@@ -1,0 +1,64 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Loja PW II | Login{% endblock %}
+
+{% block wrapper %}
+
+<div id="wrapper" class="clearfix">
+
+	{% include 'core/header.html' %}
+
+	<section id="content">
+		<div class="content-wrap">
+			<div class="container clearfix">
+
+				<div class="tabs mx-auto mb-0 clearfix" id="tab-login-register" style="max-width: 500px;">
+
+					<div class="tab-container">
+
+						<div class="tab-content" id="tab-login">
+							<div class="card mb-0">
+								<div class="card-body" style="padding: 40px;">
+
+									//action -> Declarar a função que vai tratatr o meu login
+									<form id="login-form" name="login-form" class="mb-0" action="{{url_for('login_handler')}}" method="post">
+
+										<h3>Login to your Account</h3>
+
+										<div class="row">
+											<div class="col-12 form-group">
+												<label for="login-form-username">Username:</label>
+												<input type="text" id="login-form-username" name="login-form-username"
+													value="" class="form-control" />
+											</div>
+
+											<div class="col-12 form-group">
+												<label for="login-form-password">Password:</label>
+												<input type="password" id="login-form-password"
+													name="login-form-password" value="" class="form-control" />
+											</div>
+
+											<div class="col-12 form-group">
+												<button class="button button-3d button-black m-0" id="login-form-submit"
+													name="login-form-submit" value="login">Login</button>
+												<a href="#" class="float-end">Forgot Password?</a>
+											</div>
+										</div>
+
+									</form>
+								</div>
+							</div>
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+	</section><!-- #content end -->
+
+	{% include 'core/footer.html' %}
+
+</div><!-- #wrapper end -->
+{% endblock %}

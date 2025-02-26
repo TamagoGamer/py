@@ -1,5 +1,5 @@
 from flask import Flask, render_template, redirect, url_for, request
-from models import User, db
+from models import db
 
 app = Flask(__name__, static_folder='static')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
@@ -28,28 +28,9 @@ def login_handler():
 def register():
     return render_template('register.html')
 
-@app.route('/register_handler', methods=['POST'])
-def register_handler():
-    name = request.form.get('register-form-name')
-    username = request.form.get('register-form-username')
-    email = request.form.get('register-form-email')
-    password = request.form.get('register-form-password')
-    
-    # Verifique se o usuário já existe
-    existing_user = User.query.filter_by(username=username).first()
-    if existing_user:
-        return redirect(url_for('register'))  # Redireciona se o usuário já existir
-
-    # Crie um novo usuário
-    new_user = User(name=name, username=username, email=email, password=password)
-    db.session.add(new_user)
-    db.session.commit()
-    
-    return redirect(url_for('login'))  # Redireciona para a página de login após o registro
-
 @app.errorhandler(404)
-def page_not_found(e):
-    return render_template('404.html'),404
+def page_not_found(error):
+    return render_template('404.html')
 
 if __name__ == '__main__':
     with app.app_context():
