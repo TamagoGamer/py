@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en-US">
+
+<head>
+
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="author" content="SemiColonWeb" />
+
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700|Poppins:300,400,500,600,700|PT+Serif:400,400i&display=swap" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}?v=1" type="text/css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" type="text/css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dark.css') }}" type="text/css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/font-icons.css') }}" type="text/css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/animate.css') }}" type="text/css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/magnific-popup.css') }}" type="text/css" />
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css')}}" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>{% block title%}{% endblock %}</title>
+
+</head>
+
+<body class="wrapper">
+
+    {% block wrapper%}
+    {% endblock %}
+
+    <div id="gotoTop" class="icon-angle-up"></div>
+    <script src="{{url_for('static', filename='js/jquery.js')}}"></script>
+    <script src="{{url_for('static', filename='js/plugins.min.js')}}"></script>
+    <script src="{{url_for('static', filename='js/functions.js')}}"></script>
+
+</body>
+
+</html>
