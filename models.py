@@ -9,6 +9,7 @@ class User(db.Model):
     email = db.Column(db.String(150), nullable=False, unique=True)
     password = db.Column(db.String(200), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    avatar = db.Column(db.String(200), nullable=True)  # Caminho do avatar
 
     def __repr__(self):
         return f'<User {self.username}>'

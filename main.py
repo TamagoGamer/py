@@ -2,6 +2,7 @@ from flask import Flask, render_template, redirect, url_for, request, session, f
 import os
 from models import *
 from datetime import timedelta
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__, static_folder='static')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
@@ -10,6 +11,7 @@ app.config['SECRET_KEY'] = 'sua_chave_secreta_aqui'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=1)
 app.config['UPLOAD_FOLDER'] = 'static/uploads'  # Pasta para armazenar imagens
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Limite de 16 MB por imagem
+app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
 
 db.init_app(app)
 
@@ -61,19 +63,63 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html')
 
-@app.route('/profile')
+@app.route('/profile', methods=['GET', 'POST'])
 def profile():
     if 'username' not in session or 'user_id' not in session:
-        return redirect(url_for('login'))  # Redireciona para o login se não tiver usuário na sessão
+        return redirect(url_for('login'))  # Redireciona para o login se não estiver logado
     
-    user_id = session.get('user_id')  # ID do usuário armazenado na sessão
-    user = User.query.get(user_id)  # Recuperando o usuário pelo ID, usando SQLAlchemy
-    
+    user_id = session.get('user_id')  
+    user = User.query.get(user_id)  # Busca o usuário pelo ID
+
     if user is None:
-        # Caso não encontre o usuário no banco de dados (talvez por um erro)
-        return redirect(url_for('login'))  # Redireciona novamente para o login
+        return redirect(url_for('login'))  # Redireciona se o usuário não for encontrado
+
+    # Se for um POST (upload de avatar)
+    if request.method == 'POST':
+        if 'avatar' not in request.files:
+            flash('Nenhum arquivo selecionado.', 'danger')
+            return redirect(request.url)
+        
+        file = request.files['avatar']
+        if file.filename == '':
+            flash('Nenhum arquivo selecionado.', 'danger')
+            return redirect(request.url)
+        
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(filepath)
+            
+            # Salva o caminho do avatar no banco de dados
+            user.avatar = f"uploads/{filename}"
+            db.session.commit()
+            flash('Avatar atualizado com sucesso!', 'success')
+            return redirect(url_for('profile'))
+
+    # Verifica se o usuário já tem um avatar, caso contrário usa um padrão
+    avatar = user.avatar if user.avatar else "default-avatar.jpg"
     
-    return render_template('profile.html', username=session['username'], user=user)
+    return render_template('profile.html', username=session['username'], user=user, avatar=avatar)
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
+
+@app.route('/upload_avatar', methods=['POST'])
+def upload_avatar():
+    if 'avatar' not in request.files:
+        return redirect(url_for('profile'))
+    
+    file = request.files['avatar']
+    if file.filename == '':
+        return redirect(url_for('profile'))
+    
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        return redirect(url_for('profile', avatar=filename))
+    
+    return redirect(url_for('profile'))
 
 @app.route('/logout')
 def logout():
@@ -114,6 +160,31 @@ def criar_produto():
         return redirect(url_for('index'))
 
     return render_template('criar_produto.html')
+
+@app.route('/produto/<int:produto_id>/deletar', methods=['POST'])
+def delete_product(produto_id):
+    produto = Produto.query.get_or_404(produto_id)
+    try:
+        # Deletar as imagens associadas ao produto
+        for imagem in produto.imagens:
+            db.session.delete(imagem)
+        db.session.commit()
+
+        # Deletar itens do carrinho associados ao produto
+        CartItem.query.filter_by(produto_id=produto.id).delete()
+        db.session.commit()
+
+        # Deletar o produto
+        db.session.delete(produto)
+        db.session.commit()
+        flash('Produto deletado com sucesso!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash('Erro ao deletar o produto.', 'danger')
+        print(f"Erro ao deletar o produto: {e}")
+    
+    return redirect(url_for('index'))
+
 
 @app.route('/produto/<int:produto_id>')
 def produto_single(produto_id):
