@@ -12,3 +12,27 @@ class User(db.Model):
 
     def __repr__(self):
         return f'<User {self.username}>'
+    
+class Produto(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(100), nullable=False)
+    descricao = db.Column(db.Text, nullable=False)
+    preco = db.Column(db.Float, nullable=False)
+    categoria_id = db.Column(db.Integer, db.ForeignKey('categoria.id'), nullable=False)
+    categoria = db.relationship('Categoria', backref='produtos')
+    imagens = db.relationship('Imagem', backref='produto', lazy=True)
+
+class Categoria(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(100), nullable=False)
+
+class Imagem(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    produto_id = db.Column(db.Integer, db.ForeignKey('produto.id'), nullable=False)
+
+
+    
+
+
+

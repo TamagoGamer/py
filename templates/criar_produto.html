@@ -1,0 +1,79 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Loja PW II | Adicionar Produto{% endblock %}
+
+{% block wrapper %}
+
+    {% include 'core/header.html' %}
+
+    <section id="content">
+        <div class="content-wrap">
+            <div class="container clearfix">
+
+                <div class="tabs mx-auto mb-0 clearfix" id="tab-produto" style="max-width: 500px;">
+
+                    <div class="tab-container">
+
+                        <div class="tab-content" id="tab-criar-produto">
+                            <div class="card mb-0">
+                                <div class="card-body" style="padding: 40px;">
+                                    <h3>Adicionar Novo Produto</h3>
+                                    
+                                    {% if request.args.get('error') %}
+                                        <div class="alert alert-danger">
+                                            {{ request.args.get('error') }}
+                                        </div>
+                                    {% endif %}
+
+                                    <form id="criar-produto-form" name="criar-produto-form" class="row mb-0" action="{{ url_for('criar_produto') }}" method="POST" enctype="multipart/form-data">
+                                        <div class="col-12 form-group">
+                                            <label for="produto-nome">Nome do Produto:</label>
+                                            <input type="text" id="produto-nome" name="nome" class="form-control" required />
+                                        </div>
+                                    
+                                        <div class="col-12 form-group">
+                                            <label for="produto-descricao">Descrição:</label>
+                                            <textarea id="produto-descricao" name="descricao" class="form-control" rows="4" required></textarea>
+                                        </div>
+                                    
+                                        <div class="col-12 form-group">
+                                            <label for="produto-preco">Preço:</label>
+                                            <input type="number" step="0.01" id="produto-preco" name="preco" class="form-control" required />
+                                        </div>
+                                    
+                                        <div class="col-12 form-group">
+                                            <label for="produto-categoria">Categoria:</label>
+                                            <select id="produto-categoria" name="categoria" class="form-control" required>
+                                                <option value="">Selecione uma categoria</option>
+                                                <option value="Roupas">Roupas</option>
+                                                <option value="Óculos">Óculos</option>
+                                                <option value="Chapéus">Chapéus</option>
+                                                <option value="Sapatos">Sapatos</option>
+                                                <option value="Acessórios">Acessórios</option>
+                                            </select>
+                                        </div>
+                                    
+                                        <div class="col-12 form-group">
+                                            <label for="produto-imagem">Imagem do Produto:</label>
+                                            <input type="file" id="produto-imagem" name="imagem" class="form-control" accept="image/*" required />
+                                        </div>
+                                    
+                                        <div class="col-12 form-group">
+                                            <button class="button button-3d button-black m-0" id="criar-produto-submit" name="criar-produto-submit" value="criar">Adicionar Produto</button>
+                                        </div>
+                                    </form>                                    
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    {% include 'core/footer.html' %}
+
+{% endblock %}
