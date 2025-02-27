@@ -31,6 +31,12 @@ class Imagem(db.Model):
     name = db.Column(db.String(100), nullable=False)
     produto_id = db.Column(db.Integer, db.ForeignKey('produto.id'), nullable=False)
 
+class CartItem(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    produto_id = db.Column(db.Integer, db.ForeignKey('produto.id'), nullable=False)  # Corrigido
+    quantity = db.Column(db.Integer, default=1)
+    produto = db.relationship('Produto', backref='cart_items')  # Corrigido
+
 
     
 

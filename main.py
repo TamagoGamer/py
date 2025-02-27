@@ -106,6 +106,33 @@ def criar_produto():
 
     return render_template('criar_produto.html')
 
+@app.route('/produto/<int:produto_id>')
+def produto_single(produto_id):
+    produto = Produto.query.get_or_404(produto_id)  # Busca o produto
+    return render_template('product_single.html', produto=produto)
+
+@app.route('/add_to_cart/<int:produto_id>', methods=['POST'])
+def add_to_cart(produto_id):
+    quantity = request.form.get('quantity', type=int, default=1)
+    produto = Produto.query.get_or_404(produto_id)
+
+    # Verifica se o item já está no carrinho
+    cart_item = CartItem.query.filter_by(produto_id=produto.id).first()
+    
+    if cart_item:
+        cart_item.quantity += quantity  # Atualiza a quantidade se já existir no carrinho
+    else:
+        cart_item = CartItem(produto_id=produto.id, quantity=quantity)
+        db.session.add(cart_item)
+
+    db.session.commit()
+    return redirect(url_for('cart'))
+
+@app.route('/cart')
+def cart():
+    cart_items = CartItem.query.all()
+    total = sum(item.produto.preco * item.quantity for item in cart_items)
+    return render_template('cart.html', cart_items=cart_items, total=total)
 
 @app.errorhandler(404)
 def page_not_found(error):
