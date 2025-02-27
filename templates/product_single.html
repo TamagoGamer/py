@@ -1,0 +1,36 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Loja PW II | Login{% endblock %}
+
+{% block wrapper %}
+
+<div id="wrapper" class="clearfix">
+
+	{% include 'core/header.html' %}
+
+
+    <meta charset="UTF-8">
+    <title>{{ produto.nome }}</title>
+
+    <h1>{{ produto.nome }}</h1>
+    <p><strong>Categoria:</strong> {{ produto.categoria.nome }}</p>
+    <p><strong>Preço:</strong> R$ {{ produto.preco }}</p>
+    <p><strong>Descrição:</strong> {{ produto.descricao }}</p>
+
+    <h2>Imagens</h2>
+    {% for imagem in produto.imagens %}
+        <img src="{{ url_for('static', filename='uploads/' + imagem.name) }}" alt="{{ produto.nome }}" width="300">
+    {% endfor %}
+
+    <a href="{{ url_for('index') }}">Voltar</a>
+
+    <a href="{{ url_for('carrinho') }}">Adicionar ao carrinho</a>
+    
+    {% include 'core/footer.html' %}
+
+</div>
+
+{% endblock %}
+
+
+
