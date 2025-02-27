@@ -23,7 +23,11 @@
                         {% for item in cart_items %}
                         <tr class="cart_item">
                             <td class="cart-product-remove">
-                                <a href="#" class="remove" title="Remover este item"><i class="icon-trash2"></i></a>
+                                <form action="{{ url_for('remove_from_cart', cart_item_id=item.id) }}" method="POST">
+                                    <button type="submit" class="remove" title="Remover este item">
+                                        <i class="icon-trash2"></i>
+                                    </button>
+                                </form>
                             </td>
 
                             <td class="cart-product-thumbnail">
@@ -43,12 +47,15 @@
                             </td>
 
                             <td class="cart-product-quantity">
-                                <div class="quantity">
-                                    <input type="button" value="-" class="minus">
-                                    <input type="text" name="quantity" value="{{ item.quantity }}" class="qty" />
-                                    <input type="button" value="+" class="plus">
-                                </div>
+                                <form action="{{ url_for('update_quantity', item_id=item.id) }}" method="POST">
+                                    <div class="quantity">
+                                        <input type="button" value="-" class="minus" onclick="this.form['quantity'].value=parseInt(this.form['quantity'].value)-1;this.form.submit();">
+                                        <input type="number" name="quantity" value="{{ item.quantity }}" class="qty" />
+                                        <input type="button" value="+" class="plus" onclick="this.form['quantity'].value=parseInt(this.form['quantity'].value)+1;this.form.submit();">
+                                    </div>
+                                </form>
                             </td>
+                            
 
                             <td class="cart-product-subtotal">
                                 <span class="amount">${{ item.produto.preco * item.quantity }}</span>
@@ -66,13 +73,13 @@
                                                        placeholder="Enter Coupon Code.." />
                                             </div>
                                             <div class="col-md-4 mt-3 mt-md-0">
-                                                <a href="#" class="button button-3d button-black m-0">Apply Coupon</a>
+                                                <a href="#" class="button button-3d button-black m-0">Aplicar Cupom</a>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-lg-auto pe-lg-0">
                                         <a href="#" class="button button-3d m-0">Atualizar Carrinho</a>
-                                        <a href="checkout.html" class="button button-3d mt-2 mt-sm-0 me-0">Ir para o Checkout</a>
+                                        <a href="{{ url_for('checkout') }}" class="button button-3d mt-2 mt-sm-0 me-0">Ir para o Checkout</a>
                                     </div>
                                 </div>
                             </td>

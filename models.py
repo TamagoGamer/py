@@ -32,10 +32,17 @@ class Imagem(db.Model):
     produto_id = db.Column(db.Integer, db.ForeignKey('produto.id'), nullable=False)
 
 class CartItem(db.Model):
+    __tablename__ = 'cart_item'
+
     id = db.Column(db.Integer, primary_key=True)
-    produto_id = db.Column(db.Integer, db.ForeignKey('produto.id'), nullable=False)  # Corrigido
-    quantity = db.Column(db.Integer, default=1)
-    produto = db.relationship('Produto', backref='cart_items')  # Corrigido
+    produto_id = db.Column(db.Integer, db.ForeignKey('produto.id'), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # Verifique se esta coluna existe
+
+    # Relações
+    produto = db.relationship('Produto', backref='cart_items', lazy=True)
+    user = db.relationship('User', backref='cart_items', lazy=True)
+
 
 
     

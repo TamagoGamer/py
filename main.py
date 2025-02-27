@@ -13,6 +13,15 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Limite de 16 MB por image
 
 db.init_app(app)
 
+@app.context_processor
+def cart_count_processor():
+    user_id = session.get('user_id')
+    if user_id:
+        cart_count = CartItem.query.filter_by(user_id=user_id).count()
+    else:
+        cart_count = 0
+    return {'cart_count': cart_count}
+
 @app.route('/')
 def index():
     produtos = Produto.query.all()
@@ -116,28 +125,88 @@ def add_to_cart(produto_id):
     quantity = request.form.get('quantity', type=int, default=1)
     produto = Produto.query.get_or_404(produto_id)
 
+    if 'user_id' not in session:
+        return redirect(url_for('login'))  # Redireciona para o login caso o usuário não esteja logado
+    
+    user_id = session.get('user_id')
+
     # Verifica se o item já está no carrinho
-    cart_item = CartItem.query.filter_by(produto_id=produto.id).first()
+    cart_item = CartItem.query.filter_by(produto_id=produto.id, user_id=user_id).first()
     
     if cart_item:
         cart_item.quantity += quantity  # Atualiza a quantidade se já existir no carrinho
     else:
-        cart_item = CartItem(produto_id=produto.id, quantity=quantity)
+        cart_item = CartItem(produto_id=produto.id, quantity=quantity, user_id=user_id)
         db.session.add(cart_item)
 
     db.session.commit()
     return redirect(url_for('cart'))
 
+@app.route('/update_quantity/<int:item_id>', methods=['POST'])
+def update_quantity(item_id):
+    cart_item = CartItem.query.get_or_404(item_id)
+    quantity = request.form.get('quantity', type=int)
+
+    # Atualiza a quantidade do item no carrinho
+    if quantity > 0:
+        cart_item.quantity = quantity
+        db.session.commit()
+
+    return redirect(url_for('cart'))
+
+@app.route('/remove_from_cart/<int:cart_item_id>', methods=['POST'])
+def remove_from_cart(cart_item_id):
+    cart_item = CartItem.query.get_or_404(cart_item_id)
+
+    if 'user_id' not in session:
+        return redirect(url_for('login'))  # Redireciona para o login caso o usuário não esteja logado
+    
+    user_id = session.get('user_id')
+
+    # Verifica se o item pertence ao usuário logado
+    if cart_item.user_id == user_id:
+        db.session.delete(cart_item)
+        db.session.commit()
+        flash('Item removido do carrinho com sucesso!', 'success')
+    else:
+        flash('Este item não pertence a você!', 'danger')
+
+    return redirect(url_for('cart'))
+
 @app.route('/cart')
 def cart():
-    cart_items = CartItem.query.all()
+    if 'user_id' not in session:
+        return redirect(url_for('login'))  # Redireciona para o login caso o usuário não esteja logado
+    
+    user_id = session.get('user_id')
+    cart_items = CartItem.query.filter_by(user_id=user_id).all()  # Filtra os itens do carrinho pelo usuário
     total = sum(item.produto.preco * item.quantity for item in cart_items)
+    
     return render_template('cart.html', cart_items=cart_items, total=total)
+
+def get_cart_items():
+    # Verifica se o carrinho existe na sessão, caso contrário, retorna uma lista vazia
+    return session.get('cart', [])
+
+@app.route('/checkout')
+def checkout():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))  # Redireciona para o login caso o usuário não esteja logado
+    
+    user_id = session.get('user_id')
+    
+    # Recupera os itens do carrinho do banco de dados
+    cart_items = CartItem.query.filter_by(user_id=user_id).all()  # Filtra os itens do carrinho pelo ID do usuário
+    
+    # Calcula o subtotal do carrinho
+    cart_subtotal = sum(item.produto.preco * item.quantity for item in cart_items)
+    cart_total = cart_subtotal  # Se necessário, adicione outros custos (ex: envio)
+    
+    return render_template('checkout.html', cart_items=cart_items, cart_subtotal=cart_subtotal, cart_total=cart_total)
 
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template('404.html')
-
 
 if __name__ == '__main__':
     with app.app_context():
