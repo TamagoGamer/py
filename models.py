@@ -13,16 +13,6 @@ class User(db.Model):
 
     def __repr__(self):
         return f'<User {self.username}>'
-
-class LoginActivity(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-
-    user = db.relationship('User', back_populates='logins')
-
-    def __repr__(self):
-        return f"<LoginActivity {self.timestamp}>"
     
 class Produto(db.Model):
     id = db.Column(db.Integer, primary_key=True)

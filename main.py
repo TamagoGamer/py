@@ -71,6 +71,7 @@ def profile():
     user_id = session.get('user_id')  
     user = User.query.get(user_id)  # Busca o usuário pelo ID
     logged_in = 'user_id' in session
+    produtos = Produto.query.all()
 
     if user is None:
         return redirect(url_for('login'))  # Redireciona se o usuário não for encontrado
@@ -100,7 +101,7 @@ def profile():
     # Verifica se o usuário já tem um avatar, caso contrário usa um padrão
     avatar = user.avatar if user.avatar else "default-avatar.jpg"
     
-    return render_template('profile.html', username=session['username'], user=user, avatar=avatar, logged_in=logged_in)
+    return render_template('profile.html', username=session['username'], user=user, avatar=avatar, logged_in=logged_in, produtos=produtos)
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -254,8 +255,9 @@ def cart():
     user_id = session.get('user_id')
     cart_items = CartItem.query.filter_by(user_id=user_id).all()  # Filtra os itens do carrinho pelo usuário
     total = sum(item.produto.preco * item.quantity for item in cart_items)
+    logged_in = 'user_id' in session  # Verifica se há um usuário logado
     
-    return render_template('cart.html', cart_items=cart_items, total=total)
+    return render_template('cart.html', cart_items=cart_items, total=total, logged_in=logged_in)
 
 def get_cart_items():
     # Verifica se o carrinho existe na sessão, caso contrário, retorna uma lista vazia
@@ -274,8 +276,9 @@ def checkout():
     # Calcula o subtotal do carrinho
     cart_subtotal = sum(item.produto.preco * item.quantity for item in cart_items)
     cart_total = cart_subtotal  # Se necessário, adicione outros custos (ex: envio)
+    logged_in = 'user_id' in session  # Verifica se há um usuário logado
     
-    return render_template('checkout.html', cart_items=cart_items, cart_subtotal=cart_subtotal, cart_total=cart_total)
+    return render_template('checkout.html', cart_items=cart_items, cart_subtotal=cart_subtotal, cart_total=cart_total, logged_in=logged_in)
 
 @app.errorhandler(404)
 def page_not_found(error):
