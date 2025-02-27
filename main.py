@@ -27,8 +27,8 @@ def cart_count_processor():
 @app.route('/')
 def index():
     produtos = Produto.query.all()
-    return render_template('index.html', produtos=produtos, username=session.get('username'))
-
+    logged_in = 'user_id' in session  # Verifica se há um usuário logado
+    return render_template('index.html', produtos=produtos, username=session.get('username'), logged_in=logged_in)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -70,6 +70,7 @@ def profile():
     
     user_id = session.get('user_id')  
     user = User.query.get(user_id)  # Busca o usuário pelo ID
+    logged_in = 'user_id' in session
 
     if user is None:
         return redirect(url_for('login'))  # Redireciona se o usuário não for encontrado
@@ -99,7 +100,7 @@ def profile():
     # Verifica se o usuário já tem um avatar, caso contrário usa um padrão
     avatar = user.avatar if user.avatar else "default-avatar.jpg"
     
-    return render_template('profile.html', username=session['username'], user=user, avatar=avatar)
+    return render_template('profile.html', username=session['username'], user=user, avatar=avatar, logged_in=logged_in)
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -124,6 +125,7 @@ def upload_avatar():
 @app.route('/logout')
 def logout():
     session.pop('username', None)
+    session.pop('user_id', None)  # Remove o ID do usuário também
     return redirect(url_for('index'))
 
 @app.route('/criar_produto', methods=['GET', 'POST'])
