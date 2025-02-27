@@ -5,32 +5,37 @@
 {% block wrapper %}
 
 {% include 'core/header.html' %}
+
 <div id="shop" class="shop row grid-container gutter-30" data-layout="fitRows">
     {% for produto in produtos %}
-        <div class="product col-lg-3 col-md-4 col-sm-6 col-12">
-            <div class="grid-inner">
-                <div class="product-image">
-                    <a href="#">
-                        {% if produto.imagens and produto.imagens[0].name %}
-                            <img src="{{ url_for('static', filename='uploads/' + produto.imagens[0].name) }}" alt="{{ produto.nome }}">
-                        {% else %}
-                            <img src="{{ url_for('static', filename='images/default.jpg') }}" alt="{{ produto.nome }}">
-                        {% endif %}
-                    </a>
+    <div class="product col-lg-3 col-md-4 col-sm-6 col-12">
+        <div class="grid-inner">
+            <div class="product-image">
+                <a href="#">
+                    {% if produto.imagens and produto.imagens[0].name %}
+                    <img src="{{ url_for('static', filename='uploads/' + produto.imagens[0].name) }}"
+                        alt="{{ produto.nome }}">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='images/default.jpg') }}" alt="{{ produto.nome }}">
+                    {% endif %}
+                </a>
+            </div>
+            <div class="product-desc">
+                <div class="product-title">
+                    <h3><a href="#">{{ produto.nome }}</a></h3>
                 </div>
-                <div class="product-desc">
-                    <div class="product-title">
-                        <h3><a href="#">{{ produto.nome }}</a></h3>
-                    </div>
-                    <div class="product-price">
-                        <ins>R$ {{ "%.2f"|format(produto.preco) }}</ins>
-                    </div>
-                    <div class="product-category">
-                        <span>Categoria: {{ produto.categoria.nome }}</span>
-                    </div>
+                <div class="product-price">
+                    <ins>R$ {{ "%.2f"|format(produto.preco) }}</ins>
+                </div>
+                <div class="product-category">
+                    <span>Categoria: {{ produto.categoria.nome }}</span>
                 </div>
             </div>
         </div>
+    </div>
     {% endfor %}
 </div>
+
+{% include 'core/footer.html' %}
+
 {% endblock %}
