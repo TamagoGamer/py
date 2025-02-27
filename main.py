@@ -28,6 +28,7 @@ def login():
 
         if user:
             session['username'] = user.username
+            session['user_id'] = user.id  # Armazena o ID do usuário na sessão
             session.permanent = True
             return redirect(url_for('index'))
         else:
@@ -53,9 +54,17 @@ def register():
 
 @app.route('/profile')
 def profile():
-    if 'username' not in session:
-        return redirect(url_for('login'))
-    return render_template('profile.html', username=session['username'])
+    if 'username' not in session or 'user_id' not in session:
+        return redirect(url_for('login'))  # Redireciona para o login se não tiver usuário na sessão
+    
+    user_id = session.get('user_id')  # ID do usuário armazenado na sessão
+    user = User.query.get(user_id)  # Recuperando o usuário pelo ID, usando SQLAlchemy
+    
+    if user is None:
+        # Caso não encontre o usuário no banco de dados (talvez por um erro)
+        return redirect(url_for('login'))  # Redireciona novamente para o login
+    
+    return render_template('profile.html', username=session['username'], user=user)
 
 @app.route('/logout')
 def logout():

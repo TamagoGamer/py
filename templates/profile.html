@@ -23,9 +23,14 @@
 							<img src="images/icons/avatar.jpg" class="alignleft img-circle img-thumbnail my-0" alt="Avatar" style="max-width: 84px;">
 
 							<div class="heading-block border-0">
-								<h3>SemiColonWeb</h3>
-								<span>Your Profile Bio</span>
-							</div>
+								{% if username %}
+									<h3>{{ username }}</h3>
+									<span>Your Profile Bio</span>
+								{% else %}
+									<h3>Guest</h3>
+									<span>Please log in to view your profile.</span>
+								{% endif %}
+							</div>														
 
 							<div class="clear"></div>
 
@@ -368,11 +373,8 @@
 						<div class="col-md-3">
 
 							<div class="list-group">
-								<a href="#" class="list-group-item list-group-item-action d-flex justify-content-between"><div>Profile</div><i class="icon-user"></i></a>
+								<a href="{{url_for('profile')}}" class="list-group-item list-group-item-action d-flex justify-content-between"><div>Profile</div><i class="icon-user"></i></a>
 								<a href="{{url_for('criar_produto')}}" class="list-group-item list-group-item-action d-flex justify-content-between"><div>Criar Produtos</div><i class="icon-laptop2"></i></a>
-								<a href="#" class="list-group-item list-group-item-action d-flex justify-content-between"><div>Messages</div><i class="icon-envelope2"></i></a>
-								<a href="#" class="list-group-item list-group-item-action d-flex justify-content-between"><div>Billing</div><i class="icon-credit-cards"></i></a>
-								<a href="#" class="list-group-item list-group-item-action d-flex justify-content-between"><div>Settings</div><i class="icon-cog"></i></a>
 								<a href="{{url_for('logout')}}" class="list-group-item list-group-item-action d-flex justify-content-between"><div>Logout</div><i class="icon-line2-logout"></i></a>
 							</div>
 
